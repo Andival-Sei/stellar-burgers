@@ -27,6 +27,13 @@ export const ResetPassword: FC = () => {
     }
   }, [navigate]);
 
+  // Если уже авторизованы — редиректим на главную (страница для неавторизованных)
+  useEffect(() => {
+    if (localStorage.getItem('refreshToken')) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   return (
     <ResetPasswordUI
       errorText={error?.message}
