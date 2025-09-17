@@ -8,11 +8,11 @@ import {
   selectUserLoading
 } from '@selectors/user';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from '../../hooks/useForm';
+import type { Dispatch, SetStateAction } from 'react';
 
 export const Register: FC = () => {
-  const [userName, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, onChange] = useForm({ name: '', email: '', password: '' });
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const error = useSelector(selectUserError);
@@ -21,7 +21,13 @@ export const Register: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(registerUser({ name: userName, email, password }));
+    dispatch(
+      registerUser({
+        name: form.name,
+        email: form.email,
+        password: form.password
+      })
+    );
   };
 
   useEffect(() => {
@@ -33,12 +39,28 @@ export const Register: FC = () => {
   return (
     <RegisterUI
       errorText={error || ''}
-      email={email}
-      userName={userName}
-      password={password}
-      setEmail={setEmail}
-      setPassword={setPassword}
-      setUserName={setUserName}
+      email={form.email}
+      userName={form.name}
+      password={form.password}
+      setEmail={
+        ((value: SetStateAction<string>) => {
+          const next = typeof value === 'function' ? value(form.email) : value;
+          onChange({ target: { name: 'email', value: next } } as any);
+        }) as Dispatch<SetStateAction<string>>
+      }
+      setPassword={
+        ((value: SetStateAction<string>) => {
+          const next =
+            typeof value === 'function' ? value(form.password) : value;
+          onChange({ target: { name: 'password', value: next } } as any);
+        }) as Dispatch<SetStateAction<string>>
+      }
+      setUserName={
+        ((value: SetStateAction<string>) => {
+          const next = typeof value === 'function' ? value(form.name) : value;
+          onChange({ target: { name: 'name', value: next } } as any);
+        }) as Dispatch<SetStateAction<string>>
+      }
       handleSubmit={handleSubmit}
     />
   );

@@ -1,4 +1,5 @@
-import { FC, SyntheticEvent, useState, useEffect } from 'react';
+import { FC, SyntheticEvent, useEffect } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { LoginUI } from '@ui-pages';
 import { useDispatch, useSelector } from '../../services/store';
 import { loginUser } from '@slices/user';
@@ -8,10 +9,10 @@ import {
   selectUserError
 } from '@selectors/user';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useForm } from '../../hooks/useForm';
 
 export const Login: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, onChange] = useForm({ email: '', password: '' });
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isLoading = useSelector(selectUserLoading);
@@ -21,7 +22,7 @@ export const Login: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    dispatch(loginUser({ email: form.email, password: form.password }));
   };
 
   useEffect(() => {
@@ -34,10 +35,21 @@ export const Login: FC = () => {
   return (
     <LoginUI
       errorText={error || ''}
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
+      email={form.email}
+      setEmail={
+        ((value: SetStateAction<string>) => {
+          const next = typeof value === 'function' ? value(form.email) : value;
+          onChange({ target: { name: 'email', value: next } } as any);
+        }) as Dispatch<SetStateAction<string>>
+      }
+      password={form.password}
+      setPassword={
+        ((value: SetStateAction<string>) => {
+          const next =
+            typeof value === 'function' ? value(form.password) : value;
+          onChange({ target: { name: 'password', value: next } } as any);
+        }) as Dispatch<SetStateAction<string>>
+      }
       handleSubmit={handleSubmit}
     />
   );

@@ -3,12 +3,12 @@ import { FC, SyntheticEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { selectUser } from '@selectors/user';
 import { updateUser } from '@slices/user';
+import { useForm } from '../../hooks/useForm';
 
 export const Profile: FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser) || { name: '', email: '' };
-
-  const [formValue, setFormValue] = useState({
+  const [formValue, onChange, setFormValue] = useForm({
     name: user.name,
     email: user.email,
     password: ''
@@ -50,12 +50,7 @@ export const Profile: FC = () => {
     });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormValue((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const handleInputChange = onChange;
 
   return (
     <ProfileUI

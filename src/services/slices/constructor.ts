@@ -17,13 +17,26 @@ const constructorSlice = createSlice({
   name: 'constructor',
   initialState,
   reducers: {
-    // Добавляю ингредиент: булка заменяет предыдущую, начинка добавляется в список
-    addIngredient(state, action: PayloadAction<{ ingredient: TIngredient }>) {
-      const { ingredient } = action.payload;
-      if (ingredient.type === 'bun') {
-        state.bun = { ...ingredient, id: uuidv4() };
-      } else {
-        state.ingredients.push({ ...ingredient, id: uuidv4() });
+    // Добавляю ингредиент: генерирую уникальный id в prepare (вне редьюсера)
+    addIngredient: {
+      reducer(
+        state,
+        action: PayloadAction<{ ingredient: TConstructorIngredient }>
+      ) {
+        const { ingredient } = action.payload;
+        if (ingredient.type === 'bun') {
+          state.bun = ingredient;
+        } else {
+          state.ingredients.push(ingredient);
+        }
+      },
+      prepare(payload: { ingredient: TIngredient }) {
+        const { ingredient } = payload;
+        return {
+          payload: {
+            ingredient: { ...ingredient, id: uuidv4() }
+          }
+        };
       }
     },
     // Удаляю начинку по локальному id
