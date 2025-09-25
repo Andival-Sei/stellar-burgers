@@ -13,7 +13,7 @@ import feedsReducer from './slices/feeds';
 import userReducer from './slices/user';
 
 // Собираю корневой редьюсер из слайсов
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
   burgerConstructor: constructorReducer,
   order: orderReducer,
