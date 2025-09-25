@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useEffect } from 'react';
+import { FC, SyntheticEvent, useCallback, useEffect } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { LoginUI } from '@ui-pages';
 import { useDispatch, useSelector } from '../../services/store';
@@ -11,8 +11,16 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from '../../hooks/useForm';
 
+type LoginForm = {
+  email: string;
+  password: string;
+};
+
 export const Login: FC = () => {
-  const [form, onChange] = useForm({ email: '', password: '' });
+  const [form, , setFormValues] = useForm<LoginForm>({
+    email: '',
+    password: ''
+  });
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const isLoading = useSelector(selectUserLoading);
@@ -25,6 +33,38 @@ export const Login: FC = () => {
     dispatch(loginUser({ email: form.email, password: form.password }));
   };
 
+  const setEmail = useCallback<Dispatch<SetStateAction<string>>>(
+    (value) => {
+      setFormValues((prev) => {
+        const nextValue =
+          typeof value === 'function' ? value(prev.email) : value;
+
+        if (prev.email === nextValue) {
+          return prev;
+        }
+
+        return { ...prev, email: nextValue };
+      });
+    },
+    [setFormValues]
+  );
+
+  const setPassword = useCallback<Dispatch<SetStateAction<string>>>(
+    (value) => {
+      setFormValues((prev) => {
+        const nextValue =
+          typeof value === 'function' ? value(prev.password) : value;
+
+        if (prev.password === nextValue) {
+          return prev;
+        }
+
+        return { ...prev, password: nextValue };
+      });
+    },
+    [setFormValues]
+  );
+
   useEffect(() => {
     if (user && !isLoading) {
       const from = (location.state as { from?: string })?.from || '/';
@@ -36,20 +76,9 @@ export const Login: FC = () => {
     <LoginUI
       errorText={error || ''}
       email={form.email}
-      setEmail={
-        ((value: SetStateAction<string>) => {
-          const next = typeof value === 'function' ? value(form.email) : value;
-          onChange({ target: { name: 'email', value: next } } as any);
-        }) as Dispatch<SetStateAction<string>>
-      }
+      setEmail={setEmail}
       password={form.password}
-      setPassword={
-        ((value: SetStateAction<string>) => {
-          const next =
-            typeof value === 'function' ? value(form.password) : value;
-          onChange({ target: { name: 'password', value: next } } as any);
-        }) as Dispatch<SetStateAction<string>>
-      }
+      setPassword={setPassword}
       handleSubmit={handleSubmit}
     />
   );

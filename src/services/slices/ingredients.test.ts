@@ -1,4 +1,8 @@
-import reducer, { IngredientsState, fetchIngredients } from './ingredients';
+import reducer, {
+  IngredientsState,
+  fetchIngredients,
+  ingredientsInitialState
+} from './ingredients';
 import { TIngredient } from '@utils-types';
 
 const createIngredient = (
@@ -18,16 +22,15 @@ const createIngredient = (
   ...overrides
 });
 
-describe('ingredients slice', () => {
-  const initialState: IngredientsState = {
-    items: [],
-    isLoading: false,
-    error: null
-  };
+const cloneState = (state: IngredientsState): IngredientsState => ({
+  ...state,
+  items: [...state.items]
+});
 
+describe('ingredients slice', () => {
   it('должен устанавливать флаг загрузки в true при fetchIngredients.pending', () => {
     const state = reducer(
-      initialState,
+      cloneState(ingredientsInitialState),
       fetchIngredients.pending('', undefined)
     );
 
@@ -46,7 +49,7 @@ describe('ingredients slice', () => {
 
     const state = reducer(
       {
-        ...initialState,
+        ...cloneState(ingredientsInitialState),
         isLoading: true
       },
       fetchIngredients.fulfilled(items, '', undefined)
@@ -64,7 +67,7 @@ describe('ingredients slice', () => {
 
     const state = reducer(
       {
-        ...initialState,
+        ...cloneState(ingredientsInitialState),
         isLoading: true
       },
       fetchIngredients.rejected(error, '', undefined)

@@ -81,8 +81,7 @@ describe('Страница конструктора бургера', () => {
     cy.visit('/');
     cy.wait('@getIngredients');
     cy.get('[data-cy=ingredient-card]').should('have.length.at.least', 1);
-    cy.get('[data-cy=ingredient-card]')
-      .eq(2)
+    cy.contains('[data-cy=ingredient-card]', 'Мясо бессмертных моллюсков')
       .find('[data-cy=ingredient-link]')
       .click();
 
@@ -90,6 +89,17 @@ describe('Страница конструктора бургера', () => {
       .should('be.visible')
       .and('contain.text', 'Мясо бессмертных моллюсков');
     cy.get('[data-cy=modal-overlay]').click({ force: true });
+    cy.get('[data-cy=modal]').should('not.exist');
+  });
+
+  it('закрывает модальное окно ингредиента по клавише Escape', () => {
+    cy.contains('[data-cy=ingredient-card]', 'Краторная булка')
+      .find('[data-cy=ingredient-link]')
+      .click();
+
+    cy.get('[data-cy=modal]').should('be.visible');
+
+    cy.get('body').type('{esc}');
     cy.get('[data-cy=modal]').should('not.exist');
   });
 
