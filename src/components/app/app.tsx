@@ -3,6 +3,7 @@ import styles from './app.module.css';
 
 import { AppHeader, ProtectedRoute } from '@components';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 import {
   ConstructorPage,
   Feed,
@@ -27,7 +28,7 @@ const App = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { background?: any } | undefined;
+  const state = location.state as BackgroundLocationState | undefined;
 
   useEffect(() => {
     // Загружаю ингредиенты сразу
@@ -121,3 +122,7 @@ const App = () => {
 };
 
 export default App;
+
+type BackgroundLocationState = {
+  background?: Location;
+};
