@@ -98,7 +98,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "cypress:open": "cypress open",
-    "cypress:run": "start-server-and-test \"npm run start\" http://localhost:4000 \"cypress run\""
+    "cypress:run": "start-server-and-test \"npm run start\" http://localhost:4000 \"cypress run\"",
+    "build": "webpack --mode=production"
   },
   "eslintConfig": {
     "extends": [
