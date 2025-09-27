@@ -8,14 +8,14 @@ export type ConstructorState = {
   ingredients: TConstructorIngredient[];
 };
 
-const initialState: ConstructorState = {
+export const constructorInitialState: ConstructorState = {
   bun: null,
   ingredients: []
 };
 
 const constructorSlice = createSlice({
   name: 'constructor',
-  initialState,
+  initialState: constructorInitialState,
   reducers: {
     // Добавляю ингредиент: генерирую уникальный id в prepare (вне редьюсера)
     addIngredient: {

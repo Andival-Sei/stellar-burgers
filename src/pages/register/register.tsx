@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { FC, SyntheticEvent, useCallback, useEffect } from 'react';
 import { RegisterUI } from '@ui-pages';
 import { useDispatch, useSelector } from '../../services/store';
 import { registerUser } from '@slices/user';
@@ -11,8 +11,18 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from '../../hooks/useForm';
 import type { Dispatch, SetStateAction } from 'react';
 
+type RegisterForm = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 export const Register: FC = () => {
-  const [form, onChange] = useForm({ name: '', email: '', password: '' });
+  const [form, , setFormValues] = useForm<RegisterForm>({
+    name: '',
+    email: '',
+    password: ''
+  });
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const error = useSelector(selectUserError);
@@ -36,31 +46,63 @@ export const Register: FC = () => {
     }
   }, [user, isLoading, navigate]);
 
+  const setEmail = useCallback<Dispatch<SetStateAction<string>>>(
+    (value) => {
+      setFormValues((prev) => {
+        const nextValue =
+          typeof value === 'function' ? value(prev.email) : value;
+
+        if (prev.email === nextValue) {
+          return prev;
+        }
+
+        return { ...prev, email: nextValue };
+      });
+    },
+    [setFormValues]
+  );
+
+  const setPassword = useCallback<Dispatch<SetStateAction<string>>>(
+    (value) => {
+      setFormValues((prev) => {
+        const nextValue =
+          typeof value === 'function' ? value(prev.password) : value;
+
+        if (prev.password === nextValue) {
+          return prev;
+        }
+
+        return { ...prev, password: nextValue };
+      });
+    },
+    [setFormValues]
+  );
+
+  const setUserName = useCallback<Dispatch<SetStateAction<string>>>(
+    (value) => {
+      setFormValues((prev) => {
+        const nextValue =
+          typeof value === 'function' ? value(prev.name) : value;
+
+        if (prev.name === nextValue) {
+          return prev;
+        }
+
+        return { ...prev, name: nextValue };
+      });
+    },
+    [setFormValues]
+  );
+
   return (
     <RegisterUI
       errorText={error || ''}
       email={form.email}
       userName={form.name}
       password={form.password}
-      setEmail={
-        ((value: SetStateAction<string>) => {
-          const next = typeof value === 'function' ? value(form.email) : value;
-          onChange({ target: { name: 'email', value: next } } as any);
-        }) as Dispatch<SetStateAction<string>>
-      }
-      setPassword={
-        ((value: SetStateAction<string>) => {
-          const next =
-            typeof value === 'function' ? value(form.password) : value;
-          onChange({ target: { name: 'password', value: next } } as any);
-        }) as Dispatch<SetStateAction<string>>
-      }
-      setUserName={
-        ((value: SetStateAction<string>) => {
-          const next = typeof value === 'function' ? value(form.name) : value;
-          onChange({ target: { name: 'name', value: next } } as any);
-        }) as Dispatch<SetStateAction<string>>
-      }
+      setEmail={setEmail}
+      setPassword={setPassword}
+      setUserName={setUserName}
       handleSubmit={handleSubmit}
     />
   );
